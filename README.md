@@ -27,3 +27,12 @@ This is a geographical discovery prototype, **not yet a public-transport journey
 - Map library: Leaflet. Coordinate conversion: proj4js. CSV parsing: Papa Parse.
 
 The public Nominatim service has a usage policy and is intended for low-volume use. A production version should use a geocoding provider or a properly configured service with caching and rate limits.
+
+
+## V2 preview: transport stops layer
+
+The map now has an optional **Transport Stops** layer. It queries nearby OpenStreetMap nodes in the visible map area (bus stops, public-transport platforms, rail stations/halts and ferry terminals) when the map is zoomed in to level 9 or closer. This is an exploratory infrastructure layer only: it does not contain departure times, operating days, route connections or proof that a stop has a usable service on the selected date.
+
+The layer uses the public Overpass API and is subject to its availability and fair-use limits. For a robust Scotland-wide product, the next data integration should use the Department for Transport's NaPTAN API/downloads for authoritative access-node records, then add actual timetable feeds (including Scottish bus and rail coverage) separately.
+
+Data source: OpenStreetMap contributors, https://www.openstreetmap.org/copyright.

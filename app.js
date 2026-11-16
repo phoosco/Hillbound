@@ -13,6 +13,10 @@ let markers = new Map();
 let originMarker = null;
 let origin = null;
 let selectedMunro = null;
+let transportLayer = L.layerGroup();
+let transportEnabled = false;
+let lastTransportBounds = "";
+let transportRequest = null;
 
 const list = document.getElementById("mountain-list");
 const filterInput = document.getElementById("mountain-filter");
@@ -142,5 +146,64 @@ document.getElementById("modal-map").addEventListener("click", () => {
   if(selectedMunro) map.setView([selectedMunro.lat,selectedMunro.lon],12);
   modal.hidden=true;
 });
+
+// V2 preview: load nearby public-transport access points from OpenStreetMap.
+// This is an exploratory map layer, not a timetable or service-availability feed.
+const transportToggle = document.getElementById("transport-toggle");
+function transportIcon(tags) {
+  if (tags.railway === "station" || tags.railway === "halt") return "🚆";
+  if (tags.amenity === "ferry_terminal") return "⛴";
+  return "🚌";
+}
+function transportType(tags) {
+  if (tags.railway === "station") return "Railway station";
+  if (tags.railway === "halt") return "Rail halt";
+  if (tags.amenity === "ferry_terminal") return "Ferry terminal";
+  if (tags.highway === "bus_stop") return "Bus stop";
+  return "Public transport stop";
+}
+async function loadTransportStops() {
+  if (!transportEnabled || map.getZoom() < 9) return;
+  const b = map.getBounds();
+  const boundsKey = [b.getSouth().toFixed(3),b.getWest().toFixed(3),b.getNorth().toFixed(3),b.getEast().toFixed(3)].join(",");
+  if (boundsKey === lastTransportBounds) return;
+  lastTransportBounds = boundsKey;
+  if (transportRequest) transportRequest.abort();
+  transportRequest = new AbortController();
+  statusBox.textContent = "Loading transport stops for this map area…";
+  const box = `${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()}`;
+  const query = `[out:json][timeout:25];(node[highway=bus_stop](${box});node[public_transport=platform](${box});node[railway=station](${box});node[railway=halt](${box});node[amenity=ferry_terminal](${box}););out body;`;
+  try {
+    const response = await fetch("https://overpass-api.de/api/interpreter?data=" + encodeURIComponent(query), {signal:transportRequest.signal});
+    if (!response.ok) throw new Error("Transport map data is temporarily unavailable.");
+    const result = await response.json();
+    transportLayer.clearLayers();
+    result.elements.forEach(el => {
+      if (typeof el.lat !== "number" || typeof el.lon !== "number") return;
+      const tags = el.tags || {};
+      const name = tags.name || tags.ref || transportType(tags);
+      L.circleMarker([el.lat,el.lon],{radius:5,color:"#fff",weight:1.5,fillColor:"#287e91",fillOpacity:.95})
+        .bindPopup(`<strong>${escapeHtml(name)}</strong><br>${escapeHtml(transportType(tags))}<br><small>OpenStreetMap data</small>`)
+        .addTo(transportLayer);
+    });
+    if (transportEnabled) transportLayer.addTo(map);
+    statusBox.textContent = `${result.elements.length} mapped transport access points in this area. These do not confirm that a service operates on your travel date.`;
+  } catch (err) {
+    if (err.name !== "AbortError") {
+      lastTransportBounds = "";
+      statusBox.textContent = "Couldn't load transport stops. Try again in a moment or zoom in further.";
+    }
+  }
+}
+transportToggle.addEventListener("click", () => {
+  transportEnabled = !transportEnabled;
+  transportToggle.setAttribute("aria-pressed", String(transportEnabled));
+  transportToggle.textContent = transportEnabled ? "− HIDE TRANSPORT" : "＋ TRANSPORT STOPS";
+  if (transportEnabled) loadTransportStops();
+  else { map.removeLayer(transportLayer); statusBox.textContent = "Transport stop layer hidden."; }
+});
+map.on("moveend", () => { if (transportEnabled) loadTransportStops(); });
+map.on("zoomend", () => { if (transportEnabled) loadTransportStops(); });
+
 document.getElementById("travel-date").value = new Date().toISOString().slice(0,10);
 loadMunros();
