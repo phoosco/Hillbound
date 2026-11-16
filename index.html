@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#14251f">
+  <meta name="description" content="Discover mountains you can reach without a car. Hillbound connects public transport and the hills.">
+  <title>Hillbound — Find your way to the hills</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Hillbound home">
+      <span class="brand-mark">H</span>
+      <span>hillbound<span class="brand-period">.</span></span>
+    </a>
+    <nav><a href="#discover">Discover</a><a href="#mountains">Mountains</a><a href="#about">About</a></nav>
+    <span class="beta-pill">SCOTLAND · BETA</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-line"></span> THE HILLS ARE CLOSER THAN YOU THINK</p>
+        <h1>Find your way<br>to the <em>mountains.</em></h1>
+        <p class="hero-intro">Discover where you can go hiking without a car. Start with a place, find the hills, and plan the journey.</p>
+        <a class="text-link" href="#discover">Explore the map <span>↘</span></a>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="sun"></div>
+        <svg viewBox="0 0 620 390" role="img">
+          <path d="M0 315 125 143l64 81L292 61l91 127 61-76 176 203v75H0Z" fill="#9da994"/>
+          <path d="m125 143 28 36-21-6-7 18-16-16Z" fill="#e8e9dc"/>
+          <path d="m292 61 37 51-31-17-15 20-20-20Z" fill="#f0efe5"/>
+          <path d="m447 112 25 31-22-9-10 14-13-17Z" fill="#ecece1"/>
+          <path d="M0 315 189 224l69 68 116-104 70 83 84-40 89 84v75H0Z" fill="#536e5e"/>
+          <path d="m0 315 189-91 69 68 116-104-43 112-108 27-89-4-134 67Z" fill="#334f43"/>
+          <path d="M0 350q130-48 250-4t370-15v59H0Z" fill="#203c32"/>
+          <path d="M0 371q160-25 300 0t320-6v25H0Z" fill="#172f28"/>
+        </svg>
+        <div class="art-caption">SCOTTISH HIGHLANDS <span>56°49′N 4°12′W</span></div>
+      </div>
+    </section>
+
+    <section class="search-panel" id="discover">
+      <div class="panel-heading">
+        <div><p class="eyebrow">START YOUR ADVENTURE</p><h2>Where are you setting off from?</h2></div>
+        <span class="step-number">01 / DISCOVER</span>
+      </div>
+      <form id="search-form" class="search-form">
+        <label class="location-field">
+          <span class="field-icon">⌖</span>
+          <span class="field-content"><span class="field-label">STARTING LOCATION</span><input id="origin-input" type="text" placeholder="Town, city, postcode, address or station…" autocomplete="off" required></span>
+          <button type="button" id="clear-origin" class="clear-button" aria-label="Clear location">×</button>
+        </label>
+        <label class="date-field">
+          <span class="field-content"><span class="field-label">WHEN ARE YOU GOING?</span><input id="travel-date" type="date"></span>
+        </label>
+        <button class="discover-button" type="submit">DISCOVER HILLS <span>↗</span></button>
+      </form>
+      <div class="transport-note"><span class="note-dot"></span> Buses · Trains · Ferries <span class="note-separator">|</span> Built for car-free adventures</div>
+      <div id="search-status" class="search-status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="explore-section" id="mountains">
+      <div class="section-heading">
+        <div><p class="eyebrow">THE SCOTTISH MOUNTAINS</p><h2>Start with the Munros.</h2><p class="section-intro">Explore all 282 Munros on the map. Search by name or select a summit to learn more.</p></div>
+        <div class="count-block"><strong id="munro-count">—</strong><span>MUNROS<br>TO EXPLORE</span></div>
+      </div>
+      <div class="explore-layout">
+        <div class="map-wrap">
+          <div class="map-topline"><span><i class="live-dot"></i> MOUNTAIN MAP</span><span id="map-hint">Select a marker to explore</span></div>
+          <div id="map" aria-label="Map of Scottish Munros"></div>
+          <div class="map-legend"><span><i class="legend-munro"></i> Munro summit</span><span><i class="legend-origin"></i> Your starting point</span></div>
+        </div>
+        <aside class="mountain-sidebar">
+          <div class="sidebar-search"><span>⌕</span><input id="mountain-filter" type="search" placeholder="Find a mountain…" aria-label="Find a mountain"></div>
+          <div class="list-header"><span id="list-title">ALL MUNROS</span><span id="result-count">Loading…</span></div>
+          <div id="mountain-list" class="mountain-list"><div class="loading-state">Loading the Munros…</div></div>
+          <div class="sidebar-foot">Distance from your starting point is geographic, not a public-transport journey time.</div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="truth-panel" id="about">
+      <div class="truth-icon">↗</div>
+      <div><p class="eyebrow">BUILT FOR THE CAR-FREE</p><h2>Not just where you can go.<br><em>How you get home.</em></h2></div>
+      <p>Hillbound is being built to combine buses, trains, ferries and walking routes into realistic mountain day trips. This first preview maps the Munros; live timetable and return-journey calculations are the next stage.</p>
+    </section>
+  </main>
+
+  <footer><a class="brand footer-brand" href="#"><span class="brand-mark">H</span><span>hillbound<span class="brand-period">.</span></span></a><span>Made for the long way round.</span><span>Map data © OpenStreetMap contributors</span></footer>
+
+  <div id="mountain-modal" class="modal-backdrop" hidden>
+    <section class="mountain-modal" role="dialog" aria-modal="true" aria-labelledby="modal-name">
+      <button id="close-modal" class="modal-close" aria-label="Close">×</button>
+      <p class="eyebrow">SCOTTISH MUNRO</p>
+      <h2 id="modal-name"></h2>
+      <div class="modal-stats"><div><strong id="modal-height">—</strong><span>HEIGHT</span></div><div><strong id="modal-region">—</strong><span>GRID REFERENCE</span></div></div>
+      <p class="modal-note">Transport accessibility data is not connected yet. Hillbound will add verified bus, train, ferry and walking connections in a later release.</p>
+      <button id="modal-map" class="modal-action">SHOW ON MAP ↗</button>
+    </section>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/proj4@2.9.2/dist/proj4.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
